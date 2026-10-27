@@ -1,9 +1,11 @@
 """Summarize saved benchmark predictions without fitting models or choosing thresholds."""
 import argparse
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import false_discovery_control, wilcoxon
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 MODELS = {"LR": ".lr", "HGB": ".hgb", "RF": ".rf", "TabPFN": ".tab", "TRIFF": ""}
@@ -68,6 +70,65 @@ def compute_metrics(source, seeds, include_combined=False, training_manifest=Non
     delta = validation[list(METRICS)] - external[list(METRICS)]
     delta["dataset"] = DATASETS[2]
     return pd.concat([frame, delta.reset_index()], ignore_index=True)
+
+
+def statistical_comparisons(frame):
+    """BH families: comparison type × dataset (if applicable) × metric."""
+    selected = frame.loc[frame.dataset.isin(DATASETS)].copy()
+    if selected.duplicated(["seed", "model", "dataset"]).any():
+        raise ValueError("Duplicate seed/model/dataset rows")
+    rows = []
+
+    def compare(left, right, metric, kind, dataset, group_a, group_b):
+        if not left.index.is_unique or not right.index.is_unique:
+            raise ValueError("Duplicate pairing indices")
+        if len(left) < 2 or set(left.index) != set(right.index):
+            raise ValueError("Incomplete paired seed grid")
+        a = left.sort_index().to_numpy(dtype=float)
+        b = right.sort_index().to_numpy(dtype=float)
+        if not np.isfinite(a).all() or not np.isfinite(b).all():
+            raise ValueError("Non-finite comparison scores")
+        difference = np.round(a - b, decimals=12)
+        if np.all(difference == 0):
+            statistic, p_value = 0.0, 1.0
+        else:
+            test = wilcoxon(difference, alternative="two-sided", zero_method="wilcox", method="auto")
+            statistic, p_value = map(float, test)
+        rows.append({"comparison_type": kind, "dataset": dataset, "metric": METRICS[metric],
+                     "group_a": group_a, "group_b": group_b, "n_pairs": len(a),
+                     "n_nonzero_pairs": int(np.count_nonzero(difference)),
+                     "mean_a": a.mean(), "mean_b": b.mean(),
+                     "mean_difference_a_minus_b": (a - b).mean(),
+                     "median_difference_a_minus_b": np.median(a - b),
+                     "wilcoxon_statistic": statistic, "p_value": p_value,
+                     "family": f"{kind}|{dataset}|{metric}",
+                     "test": "paired Wilcoxon signed-rank, two-sided; zero_method=wilcox; method=auto",
+                     "difference_rounding_decimals": 12,
+                     "interpretation": "Exploratory only: overlapping splits and shared external cohort; pairs are not independent clinical cohorts."})
+
+    for metric in METRICS:
+        for dataset in DATASETS:
+            subset = selected.loc[selected.dataset == dataset]
+            for model_a, model_b in combinations(MODELS, 2):
+                a = subset.loc[subset.model == model_a].set_index("seed")[metric]
+                b = subset.loc[subset.model == model_b].set_index("seed")[metric]
+                kind = "between_models_delta" if dataset == DATASETS[2] else "between_models"
+                compare(a, b, metric, kind, dataset, model_a, model_b)
+        for model in MODELS:
+            subset = selected.loc[selected.model == model]
+            a = subset.loc[subset.dataset == DATASETS[0]].set_index("seed")[metric]
+            b = subset.loc[subset.dataset == DATASETS[1]].set_index("seed")[metric]
+            compare(a, b, metric, "between_data_sources", "Validation vs 2025 test",
+                    f"{model}: Validation set", f"{model}: 2025 test set")
+    result = pd.DataFrame(rows)
+    result["p_adjusted_bh"] = np.nan
+    result["family_size"] = 0
+    for _, group in result.groupby("family", sort=False):
+        result.loc[group.index, "p_adjusted_bh"] = false_discovery_control(group.p_value.to_numpy(), method="bh")
+        result.loc[group.index, "family_size"] = len(group)
+    result["reject_bh_0_05"] = result.p_adjusted_bh < 0.05
+    return result
+
 
 
 def summarize(frame):
@@ -156,16 +217,18 @@ def main():
     seeds = list(map(int, args.seeds.split(",")))
     if len(seeds) < 2 or len(set(seeds)) != len(seeds):
         parser.error("At least two unique seeds are required for sample SD")
-    names = ["metrics.csv", "summary.csv", "performance_table.csv", "performance_table.pdf", "performance_boxplots.pdf"]
+    names = ["metrics.csv", "summary.csv", "performance_table.csv", "performance_table.pdf", "performance_boxplots.pdf", "statistical_comparisons.csv"]
     if not args.overwrite and any((args.output / name).exists() for name in names):
         raise FileExistsError("Summary outputs exist; use --overwrite")
     frame = compute_metrics(args.source, seeds, args.include_combined, args.training_manifest)
     summary = summarize(frame)
     table = make_table(summary)
+    comparisons = statistical_comparisons(frame)
     args.output.mkdir(parents=True, exist_ok=True)
     frame.to_csv(args.output / names[0], index=False)
     summary.to_csv(args.output / names[1], index=False)
     table.to_csv(args.output / names[2], index_label="Dataset / metric")
+    comparisons.to_csv(args.output / "statistical_comparisons.csv", index=False)
 
     import matplotlib
     matplotlib.use("Agg")
