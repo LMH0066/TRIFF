@@ -29,8 +29,7 @@ pip install poetry
 Then, clone the repository and install the dependencies:
 
 ```bash
-# Use the current GitHub URL until the remote repository is renamed.
-git clone https://github.com/LMH0066/Effristor.git TRIFF
+git clone https://github.com/LMH0066/TRIFF.git
 cd TRIFF
 poetry install
 ```
