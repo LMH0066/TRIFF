@@ -1,0 +1,46 @@
+feature,reference,categorical
+Patient age,33.0,False
+Partner age,34.0,False
+Previous IVF cycles,1.0,False
+Infertility type (0: Primary infertility; 1: Secondary infertility),1.0,True
+Male factors cause infertility,0.0,True
+Female factors cause infertility,1.0,True
+Years of infertility,3.0,False
+Body Mass Index (BMI),21.5,False
+Follicle Stimulating Hormone (FSH),6.63,False
+Luteinizing hormone (LH),5.14,False
+Prolactin (PRL),15.16,False
+Estradiol (E2),42.0,False
+Testosterone (T),0.82,False
+Classification of T (1: ≥0.35; 0: <0.35),1.0,True
+Progesterone (P),0.27,False
+Classification of P (1: ≥0.21; 0: <0.21),1.0,True
+anti-Müllerian hormone (AMH),2.93,False
+Gonadotropin (Gn) dosage,2050.0,False
+Gn stimulation days,10.0,False
+E2 at hCG day,2691.0,False
+LH at hCG day,2.13,False
+P at hCG day,0.59,False
+Endometrial thickness at hCG day,10.8,False
+The number of follicles ≥14mm at hCG day,9.0,False
+Number of punctured follicles,11.0,False
+Number of oocyte retrieved,9.0,False
+Type of semen (1: fresh; 2: frozen),1.0,True
+Abstinence days,4.0,False
+Liquefying time (0: normal liquefaction; 1: abnormal liquefaction),0.0,True
+Semen PH,7.5,False
+Volume before semen optimization treatment,2.5,False
+Sperm source (1: masturbation; 2: TESA/MTESA),1.0,True
+Concentration before semen optimization treatment (1: 0<X<1x10^6/mL; 2: 1x10^6/mL≤X<5x10^6/mL; 3: 5x10^6/mL≤X<10x10^6/mL; 4: 10x10^6/mL≤X<15x10^6/mL; 5: 15x10^6/mL≤X),5.0,True
+PR (Progressive motility) sperm count before semen optimization treatment,39.0,False
+NP (Non-progressive motility) sperm count before semen optimization treatment,12.0,False
+IM (Immotile) sperm count before semen optimization treatment,49.0,False
+Total sperm count before semen optimization treatment (x10^6),166.8,False
+Volume after semen optimization treatment,0.5,False
+Concentration after semen optimization treatment (1: 0<X<1x10^6/mL; 2: 1x10^6/mL≤X<5x10^6/mL; 3: 5x10^6/mL≤X<10x10^6/mL; 4: 10x10^6/mL≤X<15x10^6/mL; 5: 15x10^6/mL≤X),2.0,True
+PR sperm count after semen optimization treatment,90.0,False
+NP sperm count after semen optimization treatment,5.0,False
+IM sperm count after semen optimization treatment,5.0,False
+Number of oocyte for IVF,6.0,False
+Number of oocyte for ICSI,0.0,False
+Number of MII oocyte for ICSI,0.0,False

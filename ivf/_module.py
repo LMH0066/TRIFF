@@ -140,9 +140,14 @@ class NET(BaseModuleClass):
 
     @auto_move_data
     def inference(self, main: torch.Tensor):
-        _main = main.squeeze()
-        if len(_main.shape) == 1:
+        # Keep batch and feature axes distinct, including one-feature ablations.
+        _main = main
+        if _main.ndim == 1:
             _main = _main.unsqueeze(0)
+        elif _main.ndim == 3 and _main.shape[0] == 1:
+            _main = _main.squeeze(0)
+        if _main.ndim != 2:
+            raise ValueError("Expected [batch, features] input")
         _x = torch.nan_to_num(_main, nan=-1.0)
         _x = self.embedding(_x.unsqueeze(-1)).permute(1, 0, 2) + self.pos_embedding(
             _x

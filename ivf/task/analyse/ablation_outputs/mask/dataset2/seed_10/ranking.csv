@@ -1,0 +1,46 @@
+feature_index,feature,importance,rank
+42,Number of oocyte for IVF,0.0740132029260167,1
+44,Number of MII oocyte for ICSI,0.0243555732719869,2
+43,Number of oocyte for ICSI,0.0182179063074727,3
+25,Number of oocyte retrieved,0.0110201894119199,4
+38,Concentration after semen optimization treatment (1: 0<X<1x10^6/mL; 2: 1x10^6/mL≤X<5x10^6/mL; 3: 5x10^6/mL≤X<10x10^6/mL; 4: 10x10^6/mL≤X<15x10^6/mL; 5: 15x10^6/mL≤X),0.0107227137574227,5
+34,NP (Non-progressive motility) sperm count before semen optimization treatment,0.0078986727756273,6
+24,Number of punctured follicles,0.0057766449209339,7
+27,Abstinence days,0.0053429015440087,8
+23,The number of follicles ≥14mm at hCG day,0.0049594076052017,9
+12,Testosterone (T),0.00455500036187,10
+28,Liquefying time (0: normal liquefaction; 1: abnormal liquefaction),0.0040195604929067,11
+10,Prolactin (PRL),0.0037143412351724,12
+13,Classification of T (1: ≥0.35; 0: <0.35),0.0025595559948669,13
+16,anti-Müllerian hormone (AMH),0.0021044140756202,14
+20,LH at hCG day,0.0020230234773407,15
+19,E2 at hCG day,0.0017975690401726,16
+41,IM sperm count after semen optimization treatment,0.0016234119671935,17
+30,Volume before semen optimization treatment,0.0014837978697869,18
+33,PR (Progressive motility) sperm count before semen optimization treatment,0.0014578575066479,19
+22,Endometrial thickness at hCG day,0.001056805670305,20
+40,NP sperm count after semen optimization treatment,0.0009915644698594,21
+6,Years of infertility,0.0008659141733915,22
+17,Gonadotropin (Gn) dosage,0.0008273471870779,23
+15,Classification of P (1: ≥0.21; 0: <0.21),0.0007899437941887,24
+29,Semen PH,0.0007433528902765,25
+39,PR sperm count after semen optimization treatment,0.0006514668165436,26
+36,Total sperm count before semen optimization treatment (x10^6),0.0006494772760561,27
+9,Luteinizing hormone (LH),0.0006164537139738,28
+32,Concentration before semen optimization treatment (1: 0<X<1x10^6/mL; 2: 1x10^6/mL≤X<5x10^6/mL; 3: 5x10^6/mL≤X<10x10^6/mL; 4: 10x10^6/mL≤X<15x10^6/mL; 5: 15x10^6/mL≤X),0.000588362194594,29
+21,P at hCG day,0.0005813063544337,30
+2,Previous IVF cycles,0.0005746301046201,31
+14,Progesterone (P),0.0005572077289798,32
+8,Follicle Stimulating Hormone (FSH),0.0004106233395759,33
+4,Male factors cause infertility,0.0003177767432134,34
+5,Female factors cause infertility,0.0002982134341436,35
+18,Gn stimulation days,0.0002744051768786,36
+37,Volume after semen optimization treatment,0.0001494668473242,37
+11,Estradiol (E2),9.648563773225764e-05,38
+31,Sperm source (1: masturbation; 2: TESA/MTESA),4.841667887376387e-05,39
+3,Infertility type (0: Primary infertility; 1: Secondary infertility),4.659247852032423e-05,40
+35,IM (Immotile) sperm count before semen optimization treatment,3.624837590905373e-05,41
+26,Type of semen (1: fresh; 2: frozen),1.1530868414411089e-05,42
+1,Partner age,1.0991334602294951e-05,43
+0,Patient age,1.010952892102068e-05,44
+7,Body Mass Index (BMI),6.611705794057343e-06,45

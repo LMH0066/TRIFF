@@ -1,0 +1,62 @@
+{
+  "0": {
+    "dataset": "ivf/task/dataset/dataset_0",
+    "model": "ivf/task/.ivf/2026-04-15_17-44-31_val_metric/epoch=108-step=16895-val_metric=0.12460748106241226"
+  },
+  "1": {
+    "dataset": "ivf/task/dataset/dataset_1",
+    "model": "ivf/task/.ivf/2026-04-15_17-55-15_val_metric/epoch=129-step=20150-val_metric=0.1219809278845787"
+  },
+  "2": {
+    "dataset": "ivf/task/dataset/dataset_2",
+    "model": "ivf/task/.ivf/2026-04-15_18-06-00_val_metric/epoch=123-step=19220-val_metric=0.09263389557600021"
+  },
+  "3": {
+    "dataset": "ivf/task/dataset/dataset_3",
+    "model": "ivf/task/.ivf/2026-04-15_18-16-49_val_metric/epoch=109-step=17050-val_metric=0.13528980314731598"
+  },
+  "4": {
+    "dataset": "ivf/task/dataset/dataset_4",
+    "model": "ivf/task/.ivf/2026-04-15_18-27-28_val_metric/epoch=58-step=9145-val_metric=0.10422597080469131"
+  },
+  "5": {
+    "dataset": "ivf/task/dataset/dataset_5",
+    "model": "ivf/task/.ivf/2026-04-15_18-38-16_val_metric/epoch=64-step=10075-val_metric=0.09823917597532272"
+  },
+  "6": {
+    "dataset": "ivf/task/dataset/dataset_6",
+    "model": "ivf/task/.ivf/2026-04-15_18-49-05_val_metric/epoch=20-step=3255-val_metric=0.08883345872163773"
+  },
+  "7": {
+    "dataset": "ivf/task/dataset/dataset_7",
+    "model": "ivf/task/.ivf/2026-04-15_19-00-00_val_metric/epoch=55-step=8680-val_metric=0.13393983244895935"
+  },
+  "8": {
+    "dataset": "ivf/task/dataset/dataset_8",
+    "model": "ivf/task/.ivf/2026-04-15_19-10-48_val_metric/epoch=37-step=5890-val_metric=0.0959060862660408"
+  },
+  "9": {
+    "dataset": "ivf/task/dataset/dataset_9",
+    "model": "ivf/task/.ivf/2026-04-15_19-21-35_val_metric/epoch=99-step=15500-val_metric=0.11735876649618149"
+  },
+  "10": {
+    "dataset": "ivf/task/dataset/dataset_10",
+    "model": "ivf/task/.ivf/2026-04-15_19-32-26_val_metric/epoch=109-step=17050-val_metric=0.1358620673418045"
+  },
+  "11": {
+    "dataset": "ivf/task/dataset/dataset_11",
+    "model": "ivf/task/.ivf/2026-04-15_19-43-19_val_metric/epoch=64-step=10075-val_metric=0.10093910247087479"
+  },
+  "12": {
+    "dataset": "ivf/task/dataset/dataset_12",
+    "model": "ivf/task/.ivf/2026-04-15_19-54-11_val_metric/epoch=137-step=21390-val_metric=0.09746148437261581"
+  },
+  "13": {
+    "dataset": "ivf/task/dataset/dataset_13",
+    "model": "ivf/task/.ivf/2026-04-15_20-05-03_val_metric/epoch=105-step=16430-val_metric=0.12714600563049316"
+  },
+  "14": {
+    "dataset": "ivf/task/dataset/dataset_14",
+    "model": "ivf/task/.ivf/2026-04-15_20-16-10_val_metric/epoch=43-step=6820-val_metric=0.11735876649618149"
+  }
+}

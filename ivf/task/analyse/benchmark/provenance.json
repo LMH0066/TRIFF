@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "manifest": "/home/jin-ya-bin/Effristor/ivf/task/analyse/ablation_manifest.json",
+    "external": "/home/jin-ya-bin/Effristor/ivf/task/data.2025.xlsx",
+    "output": "/home/jin-ya-bin/Effristor/ivf/task/analyse/benchmark_refit",
+    "seeds": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14",
+    "device": "cuda:3",
+    "tabpfn_model": "/home/jin-ya-bin/.cache/tabpfn/tabpfn-v2.6-regressor-v2.6_default.ckpt"
+  },
+  "versions": {
+    "scikit-learn": "1.6.1",
+    "tabpfn": "7.0.1",
+    "torch": "2.6.0",
+    "scvi-tools": "1.2.2.post2"
+  },
+  "tabpfn_sha256": "c855169116d79d2c957a29107ffc04464555f39aec0eef90c90390f2c2b2008b",
+  "note": "Baselines fitted only on train. Combined predictions include training samples. Historical predictions are not mixed into this run.",
+  "completed_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "promotion": {
+    "canonical_output": "ivf/task/analyse/benchmark",
+    "previous_output": "/home/jin-ya-bin/Effristor/ivf/task/analyse/benchmark_refit",
+    "historical_backup": "/home/jin-ya-bin/Effristor-backups/promote-benchmark-20261021-093659"
+  }
+}

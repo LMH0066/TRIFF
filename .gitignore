@@ -163,6 +163,11 @@ cython_debug/
 
 
 # Project
+# Keep report figures, rankings, metrics and experiment configs trackable.
+# Ignore diagnostic runs, model weights and SHAP archives containing patient inputs.
+ivf/task/analyse/ablation_outputs/smoke/
+ivf/task/analyse/ablation_outputs/**/*.pt
+ivf/task/analyse/ablation_outputs/**/shap.npz
 .cometml-runs
 .config
 .aider*
