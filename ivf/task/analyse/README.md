@@ -10,7 +10,7 @@
 | Benchmark 表格与箱线图 | `benchmark_summary.py` | `benchmark_summary/` |
 | SHAP、固定模型遮蔽与绘图 | `ablation.py` | `ablation_outputs/` |
 | 单模型预测与解释 | `run.py` | 指定的 CSV / 本目录已有结果 |
-| 交互分析 | `analyse.ipynb`、`distribution_analyse.ipynb` | notebook 中指定的图表 |
+| 特征分布分析 | `distribution_analyse.ipynb` | 特征分布 CSV |
 
 `ablation_manifest.json` 统一记录 seed 0–14 对应的 AnnData 与 Effristor 模型路径；移动数据或权重后需更新它。不要将原始数据、模型或 `benchmark/*.combined.csv` 当作临时文件删除：combined 预测仍用于提取训练集指标。
 
@@ -156,10 +156,10 @@ PY
 cd ivf/task/analyse
 python run.py interpret \
   --model_path ../.ivf/2026-04-15_18-06-00_val_metric/epoch=123-step=19220-val_metric=0.09263389557600021 \
-  --adata_path ../dataset/dataset_2
+  --adata_path ../dataset/dataset_2 --output_path /tmp/effristor-predictions/attributions.csv
 ```
 
-`analyse.ipynb` 包含历史 ROC-AUC 比较与解释分析，`distribution_analyse.ipynb` 用于特征分布分析；从分析目录启动 notebook 以匹配相对路径。当前 benchmark 的标准表格和箱线图以第 1 节脚本为准。
+`distribution_analyse.ipynb` 用于特征分布分析；从分析目录启动 notebook 以匹配相对路径。当前 benchmark 的标准表格和箱线图以第 1 节脚本为准。独立解释命令仅在需要时手动执行，输出另存临时目录，不属于当前正式图表流程。
 
 ## 4. 结果解释边界
 
