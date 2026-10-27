@@ -12,7 +12,7 @@
 | 单模型预测与解释 | `run.py` | 指定的 CSV / 本目录已有结果 |
 | 特征分布分析 | `distribution_analyse.ipynb` | 特征分布 CSV |
 
-`ablation_manifest.json` 统一记录 seed 0–14 对应的 AnnData 与 Effristor 模型路径；移动数据或权重后需更新它。不要将原始数据、模型或 `benchmark/*.combined.csv` 当作临时文件删除：combined 预测仍用于提取训练集指标。
+`ablation_manifest.json` 统一记录 seed 0–14 对应的 AnnData 与 TRIFF 模型路径；移动数据或权重后需更新它。不要将原始数据、模型或 `benchmark/*.combined.csv` 当作临时文件删除：combined 预测仍用于提取训练集指标。
 
 ## 1. Benchmark
 
@@ -24,7 +24,7 @@ python -m ivf.task.analyse.benchmark_summary
 python -m ivf.task.analyse.benchmark_summary --overwrite
 ```
 
-不重新拟合或推理。默认汇总 15 个划分、5 个模型：LR、HGB、RF、TabPFN、Effristor。
+不重新拟合或推理。默认汇总 15 个划分、5 个模型：LR、HGB、RF、TabPFN、TRIFF。
 
 - LR 是 `LinearRegression(fit_intercept=False, positive=True)`，不是 Logistic Regression；HGB、RF、TabPFN 也是回归器，预测分数不一定是校准概率，不截断到 `[0, 1]`。
 - 仅计算 ROC-AUC、Average Precision（AP，`sklearn.metrics.average_precision_score`），不是梯形 PR-AUC。正类 1 为异常受精；不计算 Accuracy/F1，不需要分类阈值。
@@ -55,7 +55,7 @@ python -m ivf.task.analyse.benchmark_summary \
   --source /path/to/new_predictions --output /path/to/new_summary
 ```
 
-每个划分只用训练集拟合 LR/HGB/RF/TabPFN，同一模型生成 validation、combined（train + validation）、2025 三组预测；Effristor 复用 manifest 中已有权重，不重新训练。缺失值均值填充器只在训练集拟合；TabPFN 使用原始含缺失值输入。
+每个划分只用训练集拟合 LR/HGB/RF/TabPFN，同一模型生成 validation、combined（train + validation）、2025 三组预测；TRIFF 复用 manifest 中已有权重，不重新训练。缺失值均值填充器只在训练集拟合；TabPFN 使用原始含缺失值输入。
 
 TabPFN 默认使用本地 `~/.cache/tabpfn/tabpfn-v2.6-regressor-v2.6_default.ckpt`，可通过 `--tabpfn-model` 指定；不自动下载。HGB/RF 的 random_state=42，TabPFN random_state=0。软件版本、TabPFN 权重 SHA256、运行设置和完成划分记录于 `provenance.json`。历史版本随机设置和权重可能不同，不能声称精确复现旧拟合。
 

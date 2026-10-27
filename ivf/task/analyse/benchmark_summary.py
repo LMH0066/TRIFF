@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-MODELS = {"LR": ".lr", "HGB": ".hgb", "RF": ".rf", "TabPFN": ".tab", "Effristor": ""}
+MODELS = {"LR": ".lr", "HGB": ".hgb", "RF": ".rf", "TabPFN": ".tab", "TRIFF": ""}
 METRICS = {"roc_auc": "ROC-AUC", "average_precision": "AP"}
 DATASETS = ["Validation set", "2025 test set", "Validation set - 2025 test set"]
 

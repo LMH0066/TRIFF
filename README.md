@@ -1,4 +1,6 @@
-# Effristor
+# TRIFF
+
+**A Temporally Robust Interpretable model for total Fertilization Failure Risk in IVF/ICSI**
 
 ## Project Structure
 
@@ -19,18 +21,21 @@ The `ivf/task/` directory contains examples and scripts for specific tasks:
 ## Installation
 
 ```bash
-conda create -n Effristor python=3.10
-conda activate Effristor
+conda create -n TRIFF python=3.10
+conda activate TRIFF
 pip install poetry
 ```
 
 Then, clone the repository and install the dependencies:
 
 ```bash
-git clone https://github.com/li-ming-hong/Effristor.git
-cd Effristor
+# Use the current GitHub URL until the remote repository is renamed.
+git clone https://github.com/LMH0066/Effristor.git TRIFF
+cd TRIFF
 poetry install
 ```
+
+The Python package (`ivf`) and model class (`IVF`) retain their names for checkpoint compatibility. Existing installations may keep their original directory and Conda environment names; these do not affect the TRIFF model name.
 
 ## Usage
 

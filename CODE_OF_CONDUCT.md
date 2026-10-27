@@ -1,8 +1,8 @@
 # Develop Guidelines
 ## environment prepare
 ```bash
-conda create -n Effristor python=3.10
-conda activate Effristor
+conda create -n TRIFF python=3.10
+conda activate TRIFF
 pip install poetry
 poetry install
 ```

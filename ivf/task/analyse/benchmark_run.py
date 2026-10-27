@@ -95,11 +95,11 @@ def main():
             save_prediction(args.output / f"predictions.{seed}.tab{suffix}.csv", scores, target, ids)
         del tab
         torch.cuda.empty_cache()
-        print(f"Seed {seed}: predict existing Effristor checkpoint", flush=True)
+        print(f"Seed {seed}: predict existing TRIFF checkpoint", flush=True)
         IVF.setup_anndata(adata)
         model = IVF.load(entry["model"], adata, accelerator="gpu", device=[int(args.device.split(":")[-1])])
         if model.module is None:
-            raise ValueError("No Effristor network")
+            raise ValueError("No TRIFF network")
         net = model.module.to(args.device)
         for suffix, (features, target, ids) in sets.items():
             save_prediction(args.output / f"predictions.{seed}{suffix}.csv",
