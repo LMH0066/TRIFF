@@ -77,6 +77,25 @@ def predict(net, data, device, batch_size=64):
     return np.concatenate(predictions)
 
 
+def plot_shap_beeswarm(values, samples, names, output):
+    """Allocate approximately equal widths to feature labels and the beeswarm."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import shap
+
+    display_names = [re.sub(r"\s*\([^)]*\)", "", name).strip() for name in names]
+    shap.summary_plot(values, samples, feature_names=display_names, show=False,
+                      plot_size=(16, 9))
+    fig = plt.gcf()
+    fig.subplots_adjust(left=0.48, right=0.94, bottom=0.12, top=0.97)
+    fig.axes[0].set_position([0.48, 0.12, 0.45, 0.85])
+    if len(fig.axes) > 1:
+        fig.axes[1].set_position([0.95, 0.12, 0.012, 0.85])
+    fig.savefig(output, bbox_inches="tight")
+    plt.close(fig)
+
+
 def compute_shap(net, train, names, args, out, seed):
     import shap
 
@@ -115,10 +134,7 @@ def compute_shap(net, train, names, args, out, seed):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    display_names = [re.sub(r"\s*\([^)]*\)", "", name).strip() for name in names]
-    shap.summary_plot(values, samples, feature_names=display_names, show=False)
-    plt.savefig(out / "shap_beeswarm.pdf", bbox_inches="tight")
-    plt.close("all")
+    plot_shap_beeswarm(values, samples, names, out / "shap_beeswarm.pdf")
     shap.summary_plot(values, samples, feature_names=names, plot_type="bar", show=False)
     plt.savefig(out / "shap_importance.png", bbox_inches="tight")
     plt.close("all")
