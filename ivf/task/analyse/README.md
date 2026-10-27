@@ -9,7 +9,7 @@
 | Benchmark 预测生成 | `benchmark_run.py` | `benchmark/` |
 | Benchmark 表格与箱线图 | `benchmark_summary.py` | `benchmark_summary/` |
 | SHAP、固定模型遮蔽与绘图 | `ablation.py` | `ablation_outputs/` |
-| 单模型预测、解释与建议 | `run.py`、`suggest.sh` | 指定的 CSV / 本目录已有结果 |
+| 单模型预测与解释 | `run.py` | 指定的 CSV / 本目录已有结果 |
 | 交互分析 | `analyse.ipynb`、`distribution_analyse.ipynb` | notebook 中指定的图表 |
 
 `ablation_manifest.json` 统一记录 seed 0–14 对应的 AnnData 与 Effristor 模型路径；移动数据或权重后需更新它。不要将原始数据、模型或 `benchmark/*.combined.csv` 当作临时文件删除：combined 预测仍用于提取训练集指标。
@@ -38,7 +38,7 @@ python -m ivf.task.analyse.benchmark_summary --overwrite
 | `metrics.csv` | 各划分各模型的指标及配对差值 |
 | `summary.csv` | mean/std/count 数值汇总 |
 | `performance_table.csv`、`performance_table.pdf` | 均值 ± SD 性能表 |
-| `performance_boxplots.pdf` | 模型为横轴，上排 Validation/2025 test 并排着色，下排 Validation − 2025 test 配对差值；左 ROC-AUC、右 AP，上排 ROC-AUC 为 0.5–1；顶部统一图例，无大标题与底部说明 |
+| `performance_boxplots.pdf` | 模型为横轴，上排 Validation/2025 test 并排着色，下排 Validation − 2025 test 配对差值；左 ROC-AUC、右 AP，上排 ROC-AUC 为 0.65–1，AP 按数据范围自适应；顶部统一图例，无大标题与底部说明 |
 
 箱线图箱体为中位数与 IQR，须为 1.5 IQR，散点为各划分，白色菱形为均值；不展示 Training set，差值面板保留零参考线并按数据设置对称轴范围；表格及 CSV 仍保留训练集指标。可指定 `--source`、`--output`、`--seeds`（至少两个不同 seed）、`--training-manifest`。仅需合并集展示时使用 `--include-combined`，不与显式 `--training-manifest` 同用。
 
@@ -87,7 +87,7 @@ python -m ivf.task.analyse.ablation \
   --output ivf/task/analyse/ablation_outputs/shap/dataset2
 ```
 
-使用 dataset_2 的基准模型（与 `suggest.sh` 一致）：`2026-04-15_18-06-00_val_metric/epoch=123-step=19220-val_metric=0.09263389557600021`。排名保存为 `ablation_outputs/shap/dataset2/seed_2/ranking.csv`。默认背景样本 32、解释样本 128、5 次排列；背景与解释样本仅从该划分训练集抽取。
+使用 dataset_2 的基准模型：`2026-04-15_18-06-00_val_metric/epoch=123-step=19220-val_metric=0.09263389557600021`。排名保存为 `ablation_outputs/shap/dataset2/seed_2/ranking.csv`。默认背景样本 32、解释样本 128、5 次排列；背景与解释样本仅从该划分训练集抽取。
 
 SHAP 使用 PermutationExplainer + Independent masker，解释 sigmoid 后的异常受精概率，按 mean(abs(SHAP)) 排名；NaN 与 NaN 在 masker 中视为相等，缺失输入仍交给原网络处理。
 
@@ -126,7 +126,7 @@ python -m ivf.task.analyse.ablation \
 
 绘图拒绝含 `pr_auc` 的结果，避免将梯形 PR-AUC 误标为 AP；两者不能改列名互换，需要正确的 AP 结果或重新推理。正式图表、排名和指标可提交；仅忽略冒烟产物、权重 `*.pt` 及含样本输入的 `shap.npz`（以 `.gitignore` 为准）。
 
-## 3. 单模型预测、解释与建议分析
+## 3. 单模型预测与解释分析
 
 旧版逐个列出的 15 组模型路径已统一由 `ablation_manifest.json` 管理。正式多模型 benchmark 使用第 1 节入口，避免手工预测覆盖其中某一个模型的结果。
 
@@ -150,18 +150,16 @@ subprocess.run(command + ['--xlsx_path', 'ivf/task/data.2025.xlsx',
 PY
 ```
 
-原有解释与建议脚本使用相对路径，下面这组命令须切换到分析目录执行：
+原有解释脚本使用相对路径，下面这组命令须切换到分析目录执行：
 
 ```bash
 cd ivf/task/analyse
 python run.py interpret \
   --model_path ../.ivf/2026-04-15_18-06-00_val_metric/epoch=123-step=19220-val_metric=0.09263389557600021 \
   --adata_path ../dataset/dataset_2
-# 会执行耗时的建议优化，并可能覆盖已有 suggest_*.csv；确认需要后再运行。
-bash suggest.sh
 ```
 
-`analyse.ipynb` 包含历史 ROC-AUC 比较、解释与建议分析，`distribution_analyse.ipynb` 用于特征分布分析；从分析目录启动 notebook 以匹配相对路径。当前 benchmark 的标准表格和箱线图以第 1 节脚本为准。
+`analyse.ipynb` 包含历史 ROC-AUC 比较与解释分析，`distribution_analyse.ipynb` 用于特征分布分析；从分析目录启动 notebook 以匹配相对路径。当前 benchmark 的标准表格和箱线图以第 1 节脚本为准。
 
 ## 4. 结果解释边界
 

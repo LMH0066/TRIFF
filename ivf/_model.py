@@ -12,7 +12,7 @@ import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from anndata import AnnData
-from captum.attr import IntegratedGradients, Saliency
+from captum.attr import IntegratedGradients
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.strategies import DDPStrategy
 from scvi import REGISTRY_KEYS, settings
@@ -386,7 +386,7 @@ class IVF(BaseModelClass):
     @torch.no_grad()
     def interpret(
         self,
-        data: Sequence[float],
+        data: np.ndarray,
         internal_batch_size: int = 8,
     ):
         self.module.eval()
@@ -403,125 +403,6 @@ class IVF(BaseModelClass):
             internal_batch_size=internal_batch_size,
         )
         return attributions
-
-    @torch.no_grad()
-    def suggest(
-        self,
-        data: Sequence[float],
-        learning_rates: dict[int, float],
-        clamp_range: dict[int, tuple[float, float]],
-        need_round: dict[int, bool],
-        n_steps: int = 100,
-        need_print: bool = False,
-    ):
-        self.module.eval()
-        saliency = Saliency(self.module.inference)
-
-        if data.ndim == 1:
-            data = data.reshape(1, -1)
-        
-        inputs = torch.Tensor(data)
-        best_inputs = inputs.clone()
-        init_score = torch.sigmoid(self.module.inference(inputs))[0][0]
-        best_step, best_score = 0, init_score
-        for step in range(n_steps):
-            gradient = saliency.attribute(inputs, abs=False)
-            for feature_idx in learning_rates.keys():
-                inputs[0, feature_idx] -= learning_rates[feature_idx] * gradient[0, feature_idx]
-                inputs[0, feature_idx] = torch.clamp(inputs[0, feature_idx], clamp_range[feature_idx][0], clamp_range[feature_idx][1])
-
-            _inputs = inputs.clone()
-            for feature_idx in learning_rates.keys():
-                if need_round[feature_idx] and not torch.isnan(_inputs[0, feature_idx]):
-                    _inputs[0, feature_idx] = _inputs[0, feature_idx].round()
-
-            current_score = torch.sigmoid(self.module.inference(_inputs))[0][0]
-            if current_score < best_score:
-                best_score = current_score
-                best_inputs = _inputs
-                best_step = step + 1
-            if need_print:
-                print(
-                    "Initial Score: {};\t Best Score: {};\t Step: {};\t Current Score: {}".format(
-                        init_score, best_score, step + 1, current_score
-                    ),
-                    end='\r', flush=True
-                )
-            if step + 1 - best_step >= max(n_steps * 0.05, 10):
-                # print("Initial Score: {}; Best Score: {}".format(init_score, best_score))
-                break
-
-        changes = {}
-        for i in learning_rates.keys():
-            changes[i] = [data[0, i], best_inputs[0, i].item()]
-        return {
-            "score": [init_score.item(), best_score.item()],
-            "changes": changes
-        }
-
-    @torch.no_grad()
-    def suggest_batch(
-        self,
-        data_batch: torch.Tensor,
-        learning_rates: dict[int, float],
-        clamp_range: dict[int, tuple[float, float]],
-        need_round: dict[int, bool],
-        n_steps: int = 100,
-    ):
-        self.module.eval()
-        saliency = Saliency(self.module.inference)
-
-        if data_batch.ndim == 1:
-            data_batch = data_batch.reshape(1, -1)
-        
-        batch_size = data_batch.shape[0]
-        device = self.module.device
-        
-        inputs = torch.Tensor(data_batch).to(device)
-        init_scores = torch.sigmoid(self.module.inference(inputs)).detach()[:, 0]
-        best_inputs, best_scores = inputs.clone(), init_scores.clone()
-        best_steps = torch.zeros(batch_size, dtype=torch.long, device=device)
-        
-        feature_indices = list(learning_rates.keys())
-        lr_values = torch.tensor([learning_rates[i] for i in feature_indices], device=device)
-        clamp_mins = torch.tensor([clamp_range[i][0] for i in feature_indices], device=device)
-        clamp_maxs = torch.tensor([clamp_range[i][1] for i in feature_indices], device=device)
-        round_mask = torch.tensor([need_round[i] for i in feature_indices], device=device)
-
-        for step in range(n_steps):
-            gradient = saliency.attribute(inputs, abs=False)
-
-            inputs[:, feature_indices] -= lr_values * gradient[:, feature_indices]
-            inputs[:, feature_indices] = torch.clamp(
-                inputs[:, feature_indices],
-                clamp_mins,
-                clamp_maxs
-            )
-
-            _inputs = inputs.clone()
-            rounded = _inputs[:, feature_indices].round()
-            mask = round_mask.unsqueeze(0) & ~torch.isnan(_inputs[:, feature_indices])
-            _inputs[:, feature_indices] = torch.where(mask, rounded, _inputs[:, feature_indices])
-
-            current_scores = torch.sigmoid(self.module.inference(_inputs)).detach()[:, 0]
-            improved = current_scores < best_scores
-            best_scores = torch.where(improved, current_scores, best_scores)
-            best_inputs[improved] = _inputs[improved]
-            best_steps[improved] = step + 1
-
-        results = []
-        best_inputs_cpu = best_inputs.cpu()
-        data_batch_cpu = torch.tensor(data_batch)
-        for i in range(batch_size):
-            changes = {
-                idx: [data_batch_cpu[i, idx].item(), best_inputs_cpu[i, idx].item()]
-                for idx in feature_indices
-            }
-            results.append({
-                "score": [init_scores[i].item(), best_scores[i].item()],
-                "changes": changes
-            })
-        return results
 
     def save(
         self,
