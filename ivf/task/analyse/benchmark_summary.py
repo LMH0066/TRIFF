@@ -178,7 +178,10 @@ def plot_boxplots(frame, output):
                 lower = max(0, np.floor((data[metric].min() - 0.01) * 20) / 20)
                 upper = min(1, np.ceil((data[metric].max() + 0.01) * 20) / 20)
                 ax.set_ylim(lower, upper)
-            ax.get_legend().remove()
+            if metric == "roc_auc":
+                ax.legend(title="Data source", loc="upper left", frameon=True)
+            else:
+                ax.get_legend().remove()
         delta = frame.loc[frame.dataset == DATASETS[2]]
         for ax, (metric, label) in zip(axes[1], METRICS.items(), strict=True):
             sns.boxplot(data=delta, x="model", y=metric, order=list(MODELS),
@@ -191,11 +194,7 @@ def plot_boxplots(frame, output):
             bound = max(0.02, float(delta[metric].abs().max()) * 1.15)
             ax.set(xlabel="", ylabel=f"Δ {label}",
                    title=f"Validation set − 2025 test set — {label}", ylim=(-bound, bound))
-        from matplotlib.patches import Patch
-        fig.legend(handles=[Patch(facecolor=palette[name], label=name) for name in datasets],
-                   loc="upper center", bbox_to_anchor=(0.5, 1), ncol=len(datasets),
-                   title="Data source", frameon=False)
-        fig.tight_layout(rect=(0, 0, 1, 0.92), h_pad=2.5)
+        fig.tight_layout(h_pad=2.5)
         fig.savefig(output, bbox_inches="tight")
         plt.close(fig)
 

@@ -38,7 +38,7 @@ python -m ivf.task.analyse.benchmark_summary --overwrite
 | `metrics.csv` | 各划分各模型的指标及配对差值 |
 | `summary.csv` | mean/std/count 数值汇总 |
 | `performance_table.csv`、`performance_table.pdf` | 均值 ± SD 性能表 |
-| `performance_boxplots.pdf` | 模型为横轴，上排 Validation/2025 test 并排着色，下排 Validation − 2025 test 配对差值；左 ROC-AUC、右 AP，上排 ROC-AUC 为 0.65–1，AP 按数据范围自适应；顶部统一图例，无大标题与底部说明 |
+| `performance_boxplots.pdf` | 模型为横轴，上排 Validation/2025 test 并排着色，下排 Validation − 2025 test 配对差值；左 ROC-AUC、右 AP，上排 ROC-AUC 为 0.65–1，AP 按数据范围自适应；仅在左上子图内部显示数据来源图例，无大标题与底部说明 |
 
 箱线图箱体为中位数与 IQR，须为 1.5 IQR，散点为各划分，白色菱形为均值；不展示 Training set，差值面板保留零参考线并按数据设置对称轴范围；表格及 CSV 仍保留训练集指标。可指定 `--source`、`--output`、`--seeds`（至少两个不同 seed）、`--training-manifest`。仅需合并集展示时使用 `--include-combined`，不与显式 `--training-manifest` 同用。
 

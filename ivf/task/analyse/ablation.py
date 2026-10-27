@@ -6,6 +6,7 @@ Only trusted local scvi model checkpoints should be loaded.
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 
 import anndata
@@ -114,8 +115,9 @@ def compute_shap(net, train, names, args, out, seed):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    shap.summary_plot(values, samples, feature_names=names, show=False)
-    plt.savefig(out / "shap_beeswarm.png", bbox_inches="tight")
+    display_names = [re.sub(r"\s*\([^)]*\)", "", name).strip() for name in names]
+    shap.summary_plot(values, samples, feature_names=display_names, show=False)
+    plt.savefig(out / "shap_beeswarm.pdf", bbox_inches="tight")
     plt.close("all")
     shap.summary_plot(values, samples, feature_names=names, plot_type="bar", show=False)
     plt.savefig(out / "shap_importance.png", bbox_inches="tight")
@@ -302,7 +304,8 @@ def plot_analysis(args):
     if not args.overwrite and any(path.exists() for path in targets):
         raise FileExistsError("Plot outputs exist; use --overwrite to regenerate")
     sns.set_theme(style="whitegrid", context="paper", font_scale=1.15)
-    metrics_to_plot = [("roc_auc", "ROC-AUC"), ("average_precision", "Average precision")]
+    dataset_labels = {"validate": "Validation set", "external": "2025 test set"}
+    metrics_to_plot = [("roc_auc", "ROC-AUC"), ("average_precision", "AP")]
     for kind in ["mask"]:
         figure_width = max(12, len(counts) * 0.65)
         fig, axes = plt.subplots(len(datasets), 2, squeeze=False,
@@ -315,17 +318,17 @@ def plot_analysis(args):
             for ax, (metric, label) in zip(axes[row], metrics_to_plot, strict=True):
                 sns.boxplot(data=data, x="removed", y=metric, hue=hue,
                             order=counts, ax=ax, showmeans=True,
+                            legend=(row == 0 and metric == "roc_auc"),
                             width=0.8,
                             meanprops={"marker": "o", "markerfacecolor": "white", "markeredgecolor": "black",
                                        "markersize": 3},
                             fliersize=2, linewidth=0.8)
                 ax.set(xlabel="Number of masked features", ylabel=label,
-                       title=f"{dataset} — {label}")
+                       title=f"{dataset_labels[dataset]} — {label}")
                 if metric == "roc_auc":
                     ax.set_ylim(0, 1)
                 if len(counts) > 15:
                     ax.tick_params(axis="x", rotation=90, labelsize=9)
-        fig.suptitle(f"{kind.capitalize()} — {len(seeds)} repeated splits")
         fig.tight_layout()
         fig.savefig(out / f"{kind}_boxplots.pdf", bbox_inches="tight")
         plt.close(fig)
