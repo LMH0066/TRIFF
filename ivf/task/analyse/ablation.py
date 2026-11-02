@@ -300,6 +300,29 @@ def load_plot_data(path, seeds, counts):
     return frame
 
 
+def boxplot_statistics(frame):
+    """Export the same quartiles/whiskers used by seaborn's matplotlib backend."""
+    from matplotlib.cbook import boxplot_stats
+
+    rows = []
+    labels = {"validate": "Validation set", "external": "2025 test set"}
+    for (dataset, order, removed), group in frame.groupby(["dataset", "order", "removed"], sort=True):
+        for metric, label in [("roc_auc", "ROC-AUC"), ("average_precision", "AP")]:
+            values = group[metric].to_numpy(dtype=float)
+            stats = boxplot_stats(values, whis=1.5)[0]
+            rows.append({"dataset": dataset, "dataset_label": labels[dataset],
+                         "order": order, "removed": removed, "metric": metric,
+                         "metric_label": label, "n": len(values), "mean": stats["mean"],
+                         "std": float(np.std(values, ddof=1)) if len(values) > 1 else np.nan,
+                         "median": stats["med"], "q1": stats["q1"], "q3": stats["q3"],
+                         "iqr": stats["iqr"], "whisker_low": stats["whislo"],
+                         "whisker_high": stats["whishi"], "min": values.min(), "max": values.max(),
+                         "outlier_count": len(stats["fliers"]),
+                         "outliers": json.dumps(stats["fliers"].tolist()),
+                         "seeds": json.dumps(sorted(group.seed.astype(int).tolist()))})
+    return pd.DataFrame(rows)
+
+
 def plot_analysis(args):
     import matplotlib
     matplotlib.use("Agg")
@@ -316,7 +339,7 @@ def plot_analysis(args):
     datasets = [name for name in ["validate", "external"] if name in frame.dataset.unique()]
     if set(datasets) != set(frame.dataset.unique()):
         raise ValueError("Expected validate/external datasets")
-    targets = [out / "mask_boxplots.pdf"]
+    targets = [out / "mask_boxplots.pdf", out / "mask_boxplot_statistics.csv"]
     if not args.overwrite and any(path.exists() for path in targets):
         raise FileExistsError("Plot outputs exist; use --overwrite to regenerate")
     sns.set_theme(style="whitegrid", context="paper", font_scale=1.15)
@@ -348,7 +371,8 @@ def plot_analysis(args):
         fig.tight_layout()
         fig.savefig(out / f"{kind}_boxplots.pdf", bbox_inches="tight")
         plt.close(fig)
-    print(f"Boxplots written to {out}", flush=True)
+    boxplot_statistics(frame).to_csv(out / "mask_boxplot_statistics.csv", index=False)
+    print(f"Boxplots and statistics written to {out}", flush=True)
 
 
 def main():

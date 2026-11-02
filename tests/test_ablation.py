@@ -7,6 +7,7 @@ import torch
 
 from ivf._module import NET
 from ivf.task.analyse.ablation import (
+    boxplot_statistics,
     feature_orders,
     load_importance,
     load_plot_data,
@@ -45,9 +46,25 @@ def test_plot_uses_only_mask_results(tmp_path):
     args = argparse.Namespace(mask_results=path, seeds="0", plot_counts="0",
                               output=tmp_path / "plots", overwrite=False)
     plot_analysis(args)
-    assert [p.name for p in args.output.iterdir()] == ["mask_boxplots.pdf"]
+    assert {p.name for p in args.output.iterdir()} == {"mask_boxplots.pdf", "mask_boxplot_statistics.csv"}
+    stats = pd.read_csv(args.output / "mask_boxplot_statistics.csv")
+    assert len(stats) == 4
+    assert (stats.n == 1).all()
     with pytest.raises(FileExistsError):
         plot_analysis(args)
+
+
+def test_boxplot_statistics_quartiles_and_outliers():
+    values = [0, 1, 2, 3, 4, 5, 100]
+    frame = pd.DataFrame({"dataset": "validate", "order": "important", "removed": 1,
+                          "seed": range(7), "roc_auc": values, "average_precision": values})
+    row = boxplot_statistics(frame).iloc[0]
+    assert row["median"] == 3
+    assert row.q1 == 1.5 and row.q3 == 4.5 and row.iqr == 3
+    assert row.whisker_low == 0 and row.whisker_high == 5
+    assert row["min"] == 0 and row["max"] == 100
+    assert row.outlier_count == 1 and row.outliers == "[100.0]"
+    assert row["std"] == pytest.approx(np.std(values, ddof=1))
 
 
 def test_plot_rejects_pr_auc_results(tmp_path):
