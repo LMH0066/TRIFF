@@ -277,8 +277,8 @@ def run_seed(seed, entry, args, names, categorical, external):
         plot_results(pd.DataFrame(rows), out, "mask")
 
 
-def load_plot_data(path, seeds, counts):
-    """Load mask aggregate metrics only; never touches models or clinical samples."""
+def load_plot_data(path, seeds, counts=None):
+    """Load a complete mask grid; counts=None selects all available counts."""
     required = {"seed", "order", "removed", "dataset", "roc_auc", "average_precision",
                 "delta_roc_auc", "delta_average_precision"}
     frame = pd.read_csv(path)
@@ -288,6 +288,8 @@ def load_plot_data(path, seeds, counts):
         raise ValueError(f"Missing metric columns in {path}")
     if frame.duplicated(["seed", "order", "removed", "dataset"]).any():
         raise ValueError(f"Duplicate experiment rows in {path}")
+    if counts is None:
+        counts = sorted(frame.loc[frame.seed.isin(seeds), "removed"].unique())
     frame = frame[frame.seed.isin(seeds) & frame.removed.isin(counts)].copy()
     if frame.empty:
         raise ValueError(f"No selected rows in {path}")
@@ -333,6 +335,7 @@ def plot_analysis(args):
     seeds = list(map(int, args.seeds.split(",")))
     if not counts or len(set(seeds)) != len(seeds):
         raise ValueError("Plot counts must be nonempty and seeds unique")
+    statistics_frame = load_plot_data(args.mask_results, seeds)
     frame = load_plot_data(args.mask_results, seeds, counts)
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
@@ -371,7 +374,7 @@ def plot_analysis(args):
         fig.tight_layout()
         fig.savefig(out / f"{kind}_boxplots.pdf", bbox_inches="tight")
         plt.close(fig)
-    boxplot_statistics(frame).to_csv(out / "mask_boxplot_statistics.csv", index=False)
+    boxplot_statistics(statistics_frame).to_csv(out / "mask_boxplot_statistics.csv", index=False)
     print(f"Boxplots and statistics written to {out}", flush=True)
 
 

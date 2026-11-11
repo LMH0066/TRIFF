@@ -84,7 +84,7 @@ python -m ivf.task.analyse.ablation --stages plot --plot-counts all \
 
 只读取 `mask/dataset2/mask_all.csv`，无需 manifest、模型或 Excel。可用 `--mask-results` 指定其他结果，`--seeds` 筛选划分；要求选定实验网格完整且无重复、非有限指标。默认展示 0/1/3/5/10/15/20/30/40/44 档，使用 `--plot-counts` 调整。
 
-输出 `plot/mask_boxplots.pdf`，两行分别为 Validation set / 2025 test set，两列分别为 ROC-AUC/AP，比较三种遮蔽顺序；白色圆点为均值，不画 delta，无大标题，仅保留左上子图图例。同步输出 `plot/mask_boxplot_statistics.csv`，每个实际展示的箱体一行，包含 n、mean、样本 SD（ddof=1）、median、Q1、Q3、IQR、上下须、最小/最大值、离群值数量与 JSON 列表及 seed 列表。统计使用 Matplotlib `boxplot_stats(whis=1.5)`，与绘图口径一致；上下须是 1.5 IQR 范围内的最远实际观测值，不是理论界限。单样本箱体 SD 留空。筛选 `--seeds` / `--plot-counts` 时 CSV 同步筛选，不额外输出 PNG。已有 PDF 或统计 CSV 需 `--overwrite` 才能覆盖。
+输出 `plot/mask_boxplots.pdf`，两行分别为 Validation set / 2025 test set，两列分别为 ROC-AUC/AP，比较三种遮蔽顺序；白色圆点为均值，不画 delta，无大标题，仅保留左上子图图例。同步输出 `plot/mask_boxplot_statistics.csv`，包含所选 seed 在原始结果中全部 removed 档位（正式结果为 0–44）的箱体统计，不受 `--plot-counts` 限制；每个 dataset × order × removed × metric 一行，包含 n、mean、样本 SD（ddof=1）、median、Q1、Q3、IQR、上下须、最小/最大值、离群值数量与 JSON 列表及 seed 列表。统计使用 Matplotlib `boxplot_stats(whis=1.5)`，与绘图口径一致；上下须是 1.5 IQR 范围内的最远实际观测值，不是理论界限。单样本箱体 SD 留空。`--seeds` 同时筛选 PDF 与 CSV，`--plot-counts` 仅筛选 PDF；全部统计网格也必须完整。不额外输出 PNG。已有 PDF 或统计 CSV 需 `--overwrite` 才能覆盖。
 
 ### 2.2 生成共享 SHAP 排名
 

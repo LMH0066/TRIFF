@@ -54,6 +54,36 @@ def test_plot_uses_only_mask_results(tmp_path):
         plot_analysis(args)
 
 
+def test_statistics_include_counts_not_displayed_in_plot(tmp_path):
+    path = tmp_path / "mask_all.csv"
+    pd.DataFrame([
+        {"seed": seed, "order": order, "removed": count, "dataset": dataset,
+         "roc_auc": 0.8 - count * 0.01, "average_precision": 0.3,
+         "delta_roc_auc": -count * 0.01, "delta_average_precision": 0}
+        for seed in [0, 1] for order in ["important", "least", "random_0"]
+        for count in range(3) for dataset in ["validate", "external"]
+    ]).to_csv(path, index=False)
+    args = argparse.Namespace(mask_results=path, seeds="1", plot_counts="0,2",
+                              output=tmp_path / "plots", overwrite=False)
+    plot_analysis(args)
+    stats = pd.read_csv(args.output / "mask_boxplot_statistics.csv")
+    assert set(stats.removed) == {0, 1, 2}
+    assert len(stats) == 2 * 3 * 3 * 2
+    assert (stats.n == 1).all()
+    assert (stats.seeds == "[1]").all()
+
+
+def test_all_count_grid_rejects_missing_seed_count(tmp_path):
+    path = tmp_path / "mask_all.csv"
+    rows = [{"seed": seed, "order": "important", "removed": count,
+             "dataset": "validate", "roc_auc": 0.8, "average_precision": 0.3,
+             "delta_roc_auc": 0, "delta_average_precision": 0}
+            for seed in [0, 1] for count in range(3)]
+    pd.DataFrame(rows[:-1]).to_csv(path, index=False)
+    with pytest.raises(ValueError, match="Incomplete"):
+        load_plot_data(path, [0, 1])
+
+
 def test_boxplot_statistics_quartiles_and_outliers():
     values = [0, 1, 2, 3, 4, 5, 100]
     frame = pd.DataFrame({"dataset": "validate", "order": "important", "removed": 1,
